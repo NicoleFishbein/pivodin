@@ -1,4 +1,5 @@
-# Validin Infrastructure Hunter
+# PIVODIN - The Validin Infrastructure Hunter
+## Previously named validin-pivots
 
 <p align="center"><img src="logo.png" width="200" alt="Validin Infrastructure Hunter logo"/></p>
 
