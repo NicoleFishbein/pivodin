@@ -53,6 +53,20 @@ You can also list report URLs in `reports/reports.txt` (one URL per line, `#` fo
 https://example.com/threat-report
 ```
 
+### Corpus mode — shared signatures across a known seed set
+
+Given two or more seeds you already attribute to the same actor, corpus mode extracts the parameters they share (body/banner hashes, redirect targets, nameservers, …), promotes each into a signature, and queries Validin to discover every other host that matches:
+
+```bash
+# from a seed file (one IOC per line)
+python main.py corpus --seeds seeds.txt --depth 1
+
+# or an inline comma-separated list
+python main.py corpus --seeds "a.com,b.com,c.com" --depth 1
+```
+
+Requires at least 2 seeds. `--min-coverage N` sets how many seeds must share a parameter for it to become a signature (default 2); `--max-deep-enrich N` caps how many promoted IOCs are deep-enriched (default 20). See [Corpus mode: signature extraction vs. pairwise analysis](#corpus-mode-signature-extraction-vs-pairwise-analysis) for how it differs from pairwise analysis.
+
 ### Enrich without pivot analysis
 
 ```bash
@@ -93,6 +107,8 @@ output/hunt_suspicious-domain_20250101_120000/
   hunt_report_<ts>_iocs.txt    flat IOC list for blocklisting
 ```
 
+Corpus runs write to `output/corpus_<timestamp>/` with their own per-phase JSON and a corpus report.
+
 ## Configuration
 
 Key settings in `config.py`:
@@ -112,7 +128,7 @@ Hash type reliability weights (higher = more reliable pivot): `HOST-BANNER_0_HAS
 ## Architecture
 
 ```
-main.py               CLI — four subcommands: extract, enrich, hunt, threat-check
+main.py               CLI — five subcommands: extract, enrich, hunt, corpus, threat-check
 config.py             All tunable settings and paths
 ioc_extractor.py      Parse/defang IOCs from text; fetch report URLs
 validin_client.py     Validin REST API client (rate limiting, caching, retries)
